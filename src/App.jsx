@@ -14,9 +14,31 @@ export default function App() {
   const [selectedGenre, setSelectedGenre] = useState('Tutti')
   const [filteredMovies, setFilteredMovies] = useState(movies)
 
+  const [searchMovie, setSearchMovie] = useState('')
+
   useEffect(() => {
-    setFilteredMovies(selectedGenre === 'Tutti' ? movies : movies.filter(movie => movie.genre === selectedGenre))
-  }, [selectedGenre])
+    let filtered = movies;
+
+    if (searchMovie) {
+      filtered = filtered.filter(movie =>
+        movie.title.toLowerCase().startsWith(searchMovie.toLowerCase())
+      );
+    } else if (selectedGenre !== 'Tutti') {
+      filtered = filtered.filter(movie => movie.genre === selectedGenre);
+    }
+
+    setFilteredMovies(filtered);
+  }, [selectedGenre, searchMovie]);
+
+  const handleGenreChange = (e) => {
+    setSearchMovie('');
+    setSelectedGenre(e.target.value);
+  };
+
+  const handleSearchChange = (e) => {
+    setSelectedGenre('Tutti');
+    setSearchMovie(e.target.value);
+  };
 
   return (
     <>
@@ -28,7 +50,7 @@ export default function App() {
           <div className="navbar-nav flex-row">
             <select
               value={selectedGenre}
-              onChange={(e) => setSelectedGenre(e.target.value)}
+              onChange={handleGenreChange}
               className='form-select mb-3 w-50'
             >
               <option value="Tutti">Tutti</option>
@@ -38,8 +60,14 @@ export default function App() {
               <option value="Azione">Azione</option>
             </select>
             <form className="d-flex mb-3" role='search'>
-              <input className="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
-              <button className="btn btn-outline-success" type="submit">Search</button>
+              <input
+                className="form-control me-2"
+                type="search"
+                placeholder="Search"
+                aria-label="Search"
+                value={searchMovie}
+                onChange={handleSearchChange}
+              />
             </form>
           </div>
         </div>
